@@ -1,21 +1,26 @@
 {
-    "name": "ras8928/hello-composer",
-    "description": "My first packagist package",
-    "type": "package",
-    "require": {
-        "php": ">=7"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "ras8928",
-            "email": "tmp.rashid@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "autoload": {
-        "psr-4": {
-            "ras8928\\HelloComposer\\": "src/"
-        }
+  "name": "ras8928/hello-composer",
+  "description": "My first packagist package",
+  "keywords": [
+    "feed",
+    "rss"
+  ],
+  "version": "0.0.2",
+  "type": "package",
+  "require": {
+    "php": ">=7"
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "ras8928",
+      "email": "tmp.rashid@gmail.com"
     }
+  ],
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "ras8928\\RssRator\\": "src/"
+    }
+  }
 }
