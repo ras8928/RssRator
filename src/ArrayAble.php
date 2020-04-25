@@ -2,7 +2,9 @@
 
 namespace ras8928\RssRator;
 
-class ArrayAble implements \ArrayAccess
+use ArrayAccess;
+
+class ArrayAble implements ArrayAccess
 {
 	public function offsetExists($offset)
 	{
