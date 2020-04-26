@@ -25,8 +25,11 @@ class ContentItem extends ArrayAble
 	private $Link;
 	private $Source;
 
-	public function __construct()
+	private $rss;
+
+	public function __construct(RssRator $rss = null)
 	{
+		$this->rss = $rss;
 	}
 
 	public function getTitle()
@@ -34,7 +37,7 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($this->Title);
 	}
 
-	public function setTitle(string $Title): self
+	public function setTitle(string $Title = null): self
 	{
 		$this->Title = $Title;
 		return $this;
@@ -45,7 +48,7 @@ class ContentItem extends ArrayAble
 		return empty($string)
 			? null
 			: "<![CDATA[" . $string . ']]>';
-//		return $string;
+		//		return $string;
 	}
 
 	public function getDate()
@@ -53,7 +56,7 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($this->Date);
 	}
 
-	public function setDate(string $Date): self
+	public function setDate(string $Date = null): self
 	{
 		@$this->Date = Carbon::parse($Date);
 		$this->Date = $this->Date
@@ -66,14 +69,13 @@ class ContentItem extends ArrayAble
 	{
 		$description = $this->Description;
 
-		if ($this->IsImageInDescription()) {
+		if ($this->getImage() && $this->HasImageInDescription()) {
 			$img = '<p><img alt="image" src="'
 				. $this->getImage()
 				. '" '
 				. ($this->hasImageCaption()
 					? 'title="' . $this->ImageCaption . '" '
 					: '')
-				//
 				. '/></p>'
 				. ($this->hasImageCaption() ? "<small><em>{$this->ImageCaption}</em></small><br><br>" : '');
 
@@ -83,15 +85,10 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($description);
 	}
 
-	public function setDescription(string $Description): self
+	public function setDescription(string $Description = null): self
 	{
 		$this->Description = $Description;
 		return $this;
-	}
-
-	public function IsImageInDescription(): bool
-	{
-		return !!$this->ImageInDescription;
 	}
 
 	public function getImage()
@@ -99,10 +96,12 @@ class ContentItem extends ArrayAble
 		return $this->Image;
 	}
 
-	public function setImage(string $ImageUrl): self
+	public function setImage(string $ImageUrl = null): self
 	{
-		$this->Image = $ImageUrl;
-		$this->org_Image = $ImageUrl;
+		if (filter_var($ImageUrl, FILTER_VALIDATE_URL)) {
+			$this->Image = $ImageUrl;
+			$this->org_Image = $ImageUrl;
+		}
 		return $this;
 	}
 
@@ -116,7 +115,7 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($this->Author);
 	}
 
-	public function setAuthor(string $Author): self
+	public function setAuthor(string $Author = null): self
 	{
 		$this->Author = $Author;
 		return $this;
@@ -127,7 +126,7 @@ class ContentItem extends ArrayAble
 		return $this->ImageCaption;
 	}
 
-	public function setImageCaption(string $ImageCaption): self
+	public function setImageCaption(string $ImageCaption = null): self
 	{
 		$this->ImageCaption = $ImageCaption;
 		return $this;
@@ -143,7 +142,7 @@ class ContentItem extends ArrayAble
 		return $this->Thumb;
 	}
 
-	public function setThumb(string $ThumbUrl): self
+	public function setThumb(string $ThumbUrl = null): self
 	{
 		$this->Thumb = $ThumbUrl;
 		return $this;
@@ -156,7 +155,7 @@ class ContentItem extends ArrayAble
 				?? preg_replace('/\W+/', '', strtolower($this->Title)));
 	}
 
-	public function setGUID(string $GUID): self
+	public function setGUID(string $GUID = null): self
 	{
 		$this->GUID = $GUID;
 		return $this;
@@ -167,7 +166,7 @@ class ContentItem extends ArrayAble
 		return $this->Link;
 	}
 
-	public function setLink(string $Link): self
+	public function setLink(string $Link = null): self
 	{
 		if (filter_var($Link, FILTER_VALIDATE_URL)) {
 			$this->Link = $Link;
@@ -181,7 +180,7 @@ class ContentItem extends ArrayAble
 		return $this->Source;
 	}
 
-	public function setSource(string $Source): self
+	public function setSource(string $Source = null): self
 	{
 		$this->Source = $Source;
 		return $this;
@@ -202,5 +201,18 @@ class ContentItem extends ArrayAble
 	{
 		$this->ImageInDescription = $Hide;
 		return $this;
+	}
+
+	public function HasImageInDescription(): bool
+	{
+		return !!$this->ImageInDescription;
+	}
+
+	public function appendToRss()
+	{
+		if (!$this->rss)
+			throw new \Exception('RssRator object not provided during intialization');
+
+		$this->rss->appendItem($this);
 	}
 }

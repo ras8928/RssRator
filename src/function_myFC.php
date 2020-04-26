@@ -1,5 +1,6 @@
 <?php
-define("ROOT", __DIR__ . "/");
+if (!defined ('ROOT'))
+	define("ROOT", __DIR__ . "/");
 require_once('vendor/autoload.php');
 
 ini_set('max_execution_time', 300);
@@ -16,7 +17,7 @@ if (isLocalhost()) {
 }
 
 if (!mt_rand(0, 50)) {
-	rotateLog('error_log',50000);
+	rotateLog('error_log', 50000);
 	rotateLog('RunHeadersLog.txt');
 	rotateLog('GetsLog.txt');
 	clearCache();
@@ -273,15 +274,15 @@ function isHTTP200($url, $returnMovedURL = false)
 
 	if (!empty($hdr['LOCATION'])) {
 		if (str_contains('moved', $http_code)) {
-		$url = $hdr['LOCATION'];
+			$url = $hdr['LOCATION'];
 
-		if (isHTTP200($url)) {
-			if ($returnMovedURL) {
-				return $url;
+			if (isHTTP200($url)) {
+				if ($returnMovedURL) {
+					return $url;
+				}
+				return true;
 			}
-			return true;
 		}
-	}
 	}
 
 	if (str_contains('200', $http_code)) {

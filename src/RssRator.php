@@ -7,13 +7,15 @@ use DOMNode;
 
 require_once('function_myFC.php');
 
-class RssRator
+class RssRator extends RssRatorGetterSetter
 {
 
-	public $FeedTitle;
+	protected $FeedTitle;
+	protected $FeedDescription;
+	protected $FeedOriginUrl;
+
 	public $LastBuildDate;
 	public $Ttl;
-	public $FeedDescription;
 	public $Favico;
 
 	private $Items;
@@ -53,6 +55,10 @@ class RssRator
 
 	public function getRss()
 	{
+		if (!$this->getFeedTitle()) {
+			throw new \Exception('Feed title not set');
+		}
+
 		$this->setFeedMeta();
 		$this->createItems();
 
@@ -65,12 +71,12 @@ class RssRator
 		$this->appendChild(
 			$this->ChannelElement,
 			'title',
-			$this->FeedTitle
+			$this->getFeedTitle()
 		);
 		$this->appendChild(
 			$this->ChannelElement,
 			'description',
-			$this->FeedDescription
+			$this->getFeedDescription()
 		);
 		$this->appendChild(
 			$this->ChannelElement,
