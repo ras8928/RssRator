@@ -558,7 +558,7 @@ function googleFirstImage($searchString)
 	return;
 	$searchString = urlencode(trim($searchString));
 	$searchURL = "http://www.bing.com/images/search?q=" . $searchString; //."&qft=+filterui:age-lt10080&FORM=IRFLTR";
-	$newhtml = str_get_html(riverGet::myGet($searchURL, 72));
+	$newhtml = str_get_html(myGet($searchURL, 72));
 	$img = $newhtml->find('img', 2)->src;
 	$img = preg_replace('/&amp;w=.+/', '', $img);
 	return $img;
@@ -876,7 +876,7 @@ function applyImageCache($src): string
 
 function localImageCache($src): string
 {
-	@$img = riverGet::myGet($src, 'N/A', 'filepath') ?: null;
+	@$img = myGet($src, 'N/A', 'filepath') ?: null;
 
 	if ($img) {
 		$img = 'http://rivervalleyhay.com/assets/fc/' . $img;
