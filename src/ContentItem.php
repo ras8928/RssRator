@@ -8,7 +8,6 @@ require_once('function_myFC.php');
 
 class ContentItem extends ArrayAble
 {
-
 	private $Title;
 	private $Date;
 	private $Description;
@@ -208,10 +207,11 @@ class ContentItem extends ArrayAble
 		return !!$this->ImageInDescription;
 	}
 
-	public function appendToRss()
+	public function append()
 	{
-		if (!$this->rss)
+		if (!$this->rss) {
 			throw new \Exception('RssRator object not provided during intialization');
+		}
 
 		$this->rss->appendItem($this);
 	}

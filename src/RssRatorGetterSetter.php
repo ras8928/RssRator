@@ -20,7 +20,7 @@ abstract class RssRatorGetterSetter
 	 */
 	public function getFeedDescription()
 	{
-		return $this->FeedDescription ?? $this->getFeedTitle();;
+		return $this->FeedDescription ?? $this->getFeedTitle();
 	}
 
 	/**

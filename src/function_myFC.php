@@ -1,7 +1,8 @@
 <?php
-if (!defined ('ROOT'))
+
+if (!defined('ROOT')) {
 	define("ROOT", __DIR__ . "/");
-require_once('vendor/autoload.php');
+}
 
 ini_set('max_execution_time', 300);
 if (!isset($GLOBALS['dontRSSheader'])) {
@@ -24,30 +25,32 @@ if (!mt_rand(0, 50)) {
 }
 
 
-/**
- * @param array|string $needle
- * @param string $haystack
- * @return bool
- */
-function str_contains($needle, string $haystack)
-{
-	if (!$haystack) return false;
-
-	if (is_array($needle)) {
-		foreach ($needle as $str) {
-			if (strpos($haystack, $str) !== false) {
-				return true;
-			}
+if (!function_exists('str_contains')) {
+	/**
+	 * @param array|string $needle
+	 * @param string $haystack
+	 * @return bool
+	 */
+	function str_contains($needle, string $haystack)
+	{
+		if (!$haystack) {
+			return false;
 		}
-	} else {
-		return strpos($haystack, $needle) !== false;
+
+		if (is_array($needle)) {
+			foreach ($needle as $str) {
+				if (strpos($haystack, $str) !== false) {
+					return true;
+				}
+			}
+		} else {
+			return strpos($haystack, $needle) !== false;
+		}
 	}
 }
 
-
 function relativeToAbsoluteURL($href, $url)
 {
-
 	extract(parse_url($url), EXTR_PREFIX_ALL, 'url');
 
 	if (empty($url_scheme) || empty($url_host)) {
@@ -92,13 +95,13 @@ function cleanSpecial($txt, $trim = true)
 function utf8_urldecode($str)
 {
 	$str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str));
-	return html_entity_decode($str, null, 'UTF-8');
+	return html_entity_decode($str, ENT_COMPAT, 'UTF-8');
 }
 
 
 function isLocalhost($whitelist = ['127.0.0.1', '::1'])
 {
-	return in_array($_SERVER['REMOTE_ADDR'], $whitelist);
+	return in_array($_SERVER['REMOTE_ADDR'] ?? '', $whitelist);
 }
 
 
@@ -126,7 +129,6 @@ function clearCache($days = 60, $dir = 'cache', $pattern = '/*')
 	foreach (glob("$dir$pattern") as $f) {
 		$total++;
 		if (is_file($f) && (time() - filemtime($f) > $days)) {
-
 			$deleted += unlink($f);
 
 			// echo  "Deleted: " . basename($f) . "\n";
@@ -139,7 +141,6 @@ function clearCache($days = 60, $dir = 'cache', $pattern = '/*')
 
 function myFC_GlobalParams($html)
 {
-
 	global $url;
 	global $param;
 	global $feedTitle;
@@ -237,7 +238,9 @@ function fetchPageDescription($html_or_url, $fetch_from_url = false)
 	}
 
 
-	if (empty($description)) return false;
+	if (empty($description)) {
+		return false;
+	}
 	return [
 		'title' => $title,
 		'description' => $description,
@@ -263,11 +266,12 @@ function getAtrributeFromTag(simple_html_dom $html, array $selectors, string $at
 
 function isHTTP200($url, $returnMovedURL = false)
 {
-
 	$hdr = @get_headers($url, true);
 	$hdr = @array_change_key_case($hdr, 1);
 
-	if (!$hdr) return false;
+	if (!$hdr) {
+		return false;
+	}
 
 	$http_code = strtolower(reset($hdr));
 	//	 var_dump($hdr);
@@ -298,7 +302,6 @@ function isHTTP200($url, $returnMovedURL = false)
 
 function fetchPageOGImage($html, $fetchFromUrl = false)
 {
-
 	if ($fetchFromUrl) {
 		$contents = myGetOnlyHead($html);
 
@@ -364,7 +367,9 @@ function fetchPageFavicons($html)
 	// apple-touch-icon-precomposed		- 57ox	(also)			//png
 	// Mpclarkson\IconScraper			- plz note it fetches homepage header ie. extra HTTP request
 
-	if (empty(parse_url($url)['host'])) return;
+	if (empty(parse_url($url)['host'])) {
+		return;
+	}
 
 	$localpath = 'cache/' . preg_replace('/\W+/', '', parse_url($url)['host']) . '.svg';
 	if (file_exists($localpath)) {
@@ -442,13 +447,11 @@ function fetchPageFavicons($html)
 
 function fetchFavicon($html, $tag_name, $attribute_name, $attribute_content, $link_content)
 {
-
 	global $url;
 
 	$qrystring = ("{$tag_name}[{$attribute_name}*={$attribute_content}]");
 
 	if ($html->find($qrystring)) {
-
 		$icons = [];
 
 		foreach ($html->find($qrystring) as $link) {
@@ -564,7 +567,6 @@ function googleFirstImage($searchString)
 
 function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 {
-
 	global $forceTrim;
 	global $removeScript;
 
@@ -614,7 +616,7 @@ function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 	}
 
 	if (empty($CacheContents) || strlen(trim($CacheContents)) == 0) {
-		die('Failure in myGet');
+		throw new \Exception('Failure in myGet');
 	}
 
 	return $CacheContents;
@@ -677,7 +679,6 @@ function myGetFilePath($url)
 
 function myGetOnlyHead($url)
 {
-
 	$file_path = myGetFilePath($url);
 	if (file_exists($file_path)) {
 		return (array(
@@ -696,7 +697,6 @@ function myGetOnlyHead($url)
 	$i = 0;
 
 	while (strpos($contents, '<body') == false) {
-
 		$buffer = trim(fgets($fp, 512));
 		$contents .= $buffer;
 
@@ -738,7 +738,6 @@ function myGetOnlyHead($url)
 
 function myGetTime($url)
 {
-
 	if (!$url) {
 		return false;
 	}
@@ -774,7 +773,7 @@ function logGets($url, $getType)
 
 	$data1 = (new DateTime())->format(DATE_RSS);
 	$data20 = basename($_SERVER['SCRIPT_FILENAME']);
-	$data25 = $_SERVER["QUERY_STRING"];
+	$data25 = $_SERVER["QUERY_STRING"] ?? '';
 	$data3 = $getType;
 	$data4 = $url;
 	$data5 = getRealUserIp();
@@ -818,8 +817,7 @@ function rotateLog(
 	string $filename,
 	int $rotate_size = 500000,
 	int $files_to_keep = 10
-)
-{
+) {
 	if (file_exists($filename)) {
 		if (filesize($filename) > $rotate_size) {
 			if (file_exists($filename . "." . $files_to_keep)) {
@@ -851,13 +849,12 @@ function throwErr(string $message, int $code = 500): void
 			header("HTTP/1.1 500 Internal Server Error");
 			break;
 	}
-	die($message);
+	throw new \Exception($message);
 }
 
 
 function getImageFromDataSrcSet($dataSrcSet)
 {
-
 	$dataSrcSet = explode(',', $dataSrcSet);
 	$dataSrcSet = trim($dataSrcSet[sizeof($dataSrcSet) - 1]);
 	$dataSrcSet = preg_replace('/ .+/', '', $dataSrcSet);
@@ -892,7 +889,6 @@ function localImageCache($src): string
 
 function hashify($excerpt)
 {
-
 	$excerpt = str_replace(' KSE-100 ', ' @KSE_100 ', $excerpt);
 
 	$excerpt = str_replace(' Pakistan Muslim League – Nawaz (PML-N) ', ' #PML-N ', $excerpt);
@@ -917,8 +913,6 @@ function hashify($excerpt)
 
 function generateMusicDescription($meta)
 {
-
-
 	$description = '<pre>';
 
 	if (!empty($meta['genre'])) {
@@ -1008,7 +1002,6 @@ function parseOutput($feedItems, $param)
 
 
 	if (!empty($param['favico'])) {
-
 		if ($_SERVER['HTTP_HOST'] != parse_url($param['favico'])['host']) {
 			$param['favico'] = applyImageCache($param['favico']);
 		}
@@ -1031,8 +1024,6 @@ function parseOutput($feedItems, $param)
 
 
 	foreach ($feedItems as $item) {
-
-
 		$out .= "\n";
 		$out .= '<item>';
 		$out .= "\n";
@@ -1136,7 +1127,7 @@ function parseOutput($feedItems, $param)
 
 function rssCache_Name()
 {
-	$cachename = basename($_SERVER['SCRIPT_FILENAME']) . $_SERVER["QUERY_STRING"];
+	$cachename = basename($_SERVER['SCRIPT_FILENAME']) . ($_SERVER["QUERY_STRING"] ?? '');
 	$cachename = myGetFilePath($cachename) . '.xml';
 
 	return $cachename;

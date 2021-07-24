@@ -1,14 +1,13 @@
 {
-  "name": "ras8928/hello-composer",
-  "description": "My first packagist package",
+  "name": "ras8928/rss-rator",
+  "description": "Rss Feed Creator",
   "keywords": [
     "feed",
     "rss"
   ],
   "type": "package",
   "require": {
-    "php": ">=7.1",
-    "nesbot/carbon": "^2",
+    "nesbot/carbon": "^1",
     "ext-dom": "*"
   },
   "license": "MIT",

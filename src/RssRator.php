@@ -5,11 +5,8 @@ namespace ras8928\RssRator;
 use DOMDocument;
 use DOMNode;
 
-require_once('function_myFC.php');
-
 class RssRator extends RssRatorGetterSetter
 {
-
 	protected $FeedTitle;
 	protected $FeedDescription;
 	protected $FeedOriginUrl;
@@ -18,11 +15,11 @@ class RssRator extends RssRatorGetterSetter
 	public $Ttl;
 	public $Favico;
 
-	private $Items;
+	private $Items = [];
 	private $dom;
 	private $ChannelElement;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->dom = new DOMDocument;
 		$this->dom->preserveWhiteSpace = false;
@@ -45,7 +42,7 @@ class RssRator extends RssRatorGetterSetter
 
 	public function createItem()
 	{
-		return new ContentItem();
+		return new ContentItem($this);
 	}
 
 	public function appendItem(ContentItem $item)
@@ -67,7 +64,6 @@ class RssRator extends RssRatorGetterSetter
 
 	private function setFeedMeta()
 	{
-
 		$this->appendChild(
 			$this->ChannelElement,
 			'title',
