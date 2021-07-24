@@ -36,18 +36,22 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($this->Title);
 	}
 
-	public function setTitle(string $Title = null): self
+	public function setTitle(string $Title = null, bool $clean = true): self
 	{
-		$this->Title = $Title;
+		$this->Title = trim($Title);
+
+		if ($clean) {
+			$this->cleanTitle();
+		}
+
 		return $this;
 	}
 
-	private function encloseInCDATA($string)
+	public function cleanTitle()
 	{
-		return empty($string)
-			? null
-			: "<![CDATA[" . $string . ']]>';
-		//		return $string;
+		$this->Title = cleanSpecial($this->Title);
+
+		return $this;
 	}
 
 	public function getDate()
@@ -55,12 +59,23 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($this->Date);
 	}
 
-	public function setDate(string $Date = null): self
+	/** @param string|Carbon|\DateTime $Date */
+	public function setDate($Date = null): self
 	{
-		@$this->Date = Carbon::parse($Date);
-		$this->Date = $this->Date
-			? $this->Date->format(DATE_RSS)
-			: null;
+		if (
+			$Date instanceof Carbon
+			|| $Date instanceof \DateTime
+		) {
+			$this->Date = $Date->format(DATE_RSS);
+		} elseif (is_string($Date)) {
+			@$this->Date = Carbon::parse($Date);
+			$this->Date = $this->Date
+				? $this->Date->format(DATE_RSS)
+				: null;
+		} elseif (!$Date) {
+			$this->Date = null;
+		}
+
 		return $this;
 	}
 
@@ -86,7 +101,15 @@ class ContentItem extends ArrayAble
 
 	public function setDescription(string $Description = null): self
 	{
-		$this->Description = $Description;
+		$this->Description = trim($Description);
+
+		return $this;
+	}
+
+	public function cleanDescription()
+	{
+		$this->Description = cleanSpecial($this->Description);
+
 		return $this;
 	}
 
@@ -101,6 +124,7 @@ class ContentItem extends ArrayAble
 			$this->Image = $ImageUrl;
 			$this->org_Image = $ImageUrl;
 		}
+
 		return $this;
 	}
 
@@ -117,6 +141,7 @@ class ContentItem extends ArrayAble
 	public function setAuthor(string $Author = null): self
 	{
 		$this->Author = $Author;
+
 		return $this;
 	}
 
@@ -128,6 +153,7 @@ class ContentItem extends ArrayAble
 	public function setImageCaption(string $ImageCaption = null): self
 	{
 		$this->ImageCaption = $ImageCaption;
+
 		return $this;
 	}
 
@@ -144,6 +170,7 @@ class ContentItem extends ArrayAble
 	public function setThumb(string $ThumbUrl = null): self
 	{
 		$this->Thumb = $ThumbUrl;
+
 		return $this;
 	}
 
@@ -157,6 +184,7 @@ class ContentItem extends ArrayAble
 	public function setGUID(string $GUID = null): self
 	{
 		$this->GUID = $GUID;
+
 		return $this;
 	}
 
@@ -182,29 +210,32 @@ class ContentItem extends ArrayAble
 	public function setSource(string $Source = null): self
 	{
 		$this->Source = $Source;
+
 		return $this;
 	}
 
 	public function CacheImage(bool $HasCache = true)
 	{
 		$this->ImageCache = $HasCache;
+
 		return $this;
 	}
 
 	public function IsImageCached(): bool
 	{
-		return !!$this->ImageCache;
+		return (bool) $this->ImageCache;
 	}
 
 	public function HideImageInDescription(bool $Hide = true)
 	{
 		$this->ImageInDescription = $Hide;
+
 		return $this;
 	}
 
 	public function HasImageInDescription(): bool
 	{
-		return !!$this->ImageInDescription;
+		return (bool) $this->ImageInDescription;
 	}
 
 	public function append()
@@ -214,5 +245,13 @@ class ContentItem extends ArrayAble
 		}
 
 		$this->rss->appendItem($this);
+	}
+
+	private function encloseInCDATA($string)
+	{
+		return empty($string)
+			? null
+			: '<![CDATA[' . $string . ']]>';
+		//		return $string;
 	}
 }

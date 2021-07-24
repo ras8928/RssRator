@@ -7,13 +7,13 @@ use DOMNode;
 
 class RssRator extends RssRatorGetterSetter
 {
-	protected $FeedTitle;
-	protected $FeedDescription;
-	protected $FeedOriginUrl;
-
 	public $LastBuildDate;
 	public $Ttl;
 	public $Favico;
+
+	protected $FeedTitle;
+	protected $FeedDescription;
+	protected $FeedOriginUrl;
 
 	private $Items = [];
 	private $dom;
@@ -21,7 +21,7 @@ class RssRator extends RssRatorGetterSetter
 
 	public function __construct()
 	{
-		$this->dom = new DOMDocument;
+		$this->dom = new DOMDocument();
 		$this->dom->preserveWhiteSpace = false;
 		$this->dom->formatOutput = true;
 
@@ -30,14 +30,6 @@ class RssRator extends RssRatorGetterSetter
 		$this->ChannelElement = $this->dom
 			->getElementsByTagName('channel')
 			->item(0);
-	}
-
-	/** @noinspection XmlUnusedNamespaceDeclaration */
-	private function boilerPlateRss()
-	{
-		return '<?xml version="1.0" encoding="UTF-8"?>
-		<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:webfeeds="http://webfeeds.org/rss/1.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
-		<channel></channel></rss>';
 	}
 
 	public function createItem()
@@ -60,6 +52,26 @@ class RssRator extends RssRatorGetterSetter
 		$this->createItems();
 
 		return $this->dom->saveXML();
+	}
+
+	public function publish()
+	{
+		header('Content-Type: application/rss+xml; charset=utf-8');
+		header("Connection: Keep-Alive");
+		header("Keep-Alive: timeout=300");
+		header("Cache-Control: no-cache, must-revalidate"); //HTTP 1.1
+		header("Pragma: no-cache"); //HTTP 1.0
+
+		echo $this->getRss();
+		exit;
+	}
+
+	/** @noinspection XmlUnusedNamespaceDeclaration */
+	private function boilerPlateRss()
+	{
+		return '<?xml version="1.0" encoding="UTF-8"?>
+		<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:webfeeds="http://webfeeds.org/rss/1.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+		<channel></channel></rss>';
 	}
 
 	private function setFeedMeta()
@@ -92,15 +104,11 @@ class RssRator extends RssRatorGetterSetter
 	}
 
 	/**
-	 * @param DOMNode $ParentElement
-	 * @param string $ElementName
-	 * @param string|null $Content
-	 * @param array $Attribs
-	 * @return bool|DOMNode
+	 * @return false|DOMNode
 	 */
 	private function appendChild(DOMNode $ParentElement, string $ElementName, string $Content = null, array $Attribs = [])
 	{
-		if ($Content !== null) {
+		if (null !== $Content) {
 			$element = $this->dom->createElement($ElementName);
 
 			if ($Content) {
@@ -115,14 +123,13 @@ class RssRator extends RssRatorGetterSetter
 
 			return $ParentElement->appendChild($element);
 		}
+
 		return false;
 	}
-
 
 	private function createItems()
 	{
 		foreach ($this->Items as $ItemData) {
-
 			// CREATE NEW ITEM IN CHANEL
 			$ItemElement = $this->appendChild(
 				$this->ChannelElement,
@@ -135,7 +142,7 @@ class RssRator extends RssRatorGetterSetter
 		}
 	}
 
-	private function setItem(DOMNode $ItemElement, ContentItem $ItemData): void
+	private function setItem(DOMNode $ItemElement, ContentItem $ItemData)
 	{
 		$this->appendChild(
 			$ItemElement,
