@@ -943,11 +943,7 @@ function parseOutput($feedItems, $param)
 	$feedTitle = $param['feedTitle'];
 
 	if (empty($param['feedDescription'])) {
-		if (empty($param['description'])) {
-			$param['feedDescription'] = $feedTitle;
-		} else {
-			$param['feedDescription'] = $param['description'];
-		}
+		$param['feedDescription'] = $feedTitle;
 	}
 
 	$out = null;
