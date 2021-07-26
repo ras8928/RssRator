@@ -18,7 +18,7 @@ return $config
         'array_syntax' => ['syntax' => 'short'],
         'combine_nested_dirname' => true,
         'concat_space' => ['spacing' => 'one'],
-        'constant_case' => ['case' => 'upper'],
+        'constant_case' => ['case' => 'lower'],
         'dir_constant' => true,
         'function_to_constant' => true,
         'is_null' => true,
