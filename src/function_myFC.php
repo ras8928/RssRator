@@ -1,9 +1,5 @@
 <?php
 
-if (!defined('ROOT')) {
-	define('ROOT', __DIR__ . '/');
-}
-
 ini_set('max_execution_time', 300);
 if (!isset($GLOBALS['dontRSSheader'])) {
 	header('Content-Type: application/rss+xml; charset=utf-8');
