@@ -72,7 +72,16 @@ function relativeToAbsoluteURL($href, $url)
 
 function cleanSpecial($txt, $trim = true)
 {
-	$txt = str_replace('&#39;', "'", $txt);
+	$txt = str_replace(
+		[
+			'’',
+			'&#226;&#8364;&#8482;',
+			'&#39;',
+			'&#x27;',
+		],
+		"'",
+		$txt
+	);
 	if ($trim) {
 		$txt = trim($txt);
 	}
