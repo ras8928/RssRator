@@ -1,13 +1,7 @@
 <?php
 
 ini_set('max_execution_time', 300);
-if (!isset($GLOBALS['dontRSSheader'])) {
-	header('Content-Type: application/rss+xml; charset=utf-8');
-}
-header('Connection: Keep-Alive');
-header('Keep-Alive: timeout=300');
-header('Cache-Control: no-cache, must-revalidate'); //HTTP 1.1
-header('Pragma: no-cache'); //HTTP 1.0
+
 if (isLocalhost()) {
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -935,6 +929,14 @@ function generateMusicExternalLinks($item)
 
 function parseOutput($feedItems, $param)
 {
+	if (!isset($GLOBALS['dontRSSheader'])) {
+		header('Content-Type: application/rss+xml; charset=utf-8');
+	}
+	header('Connection: Keep-Alive');
+	header('Keep-Alive: timeout=300');
+	header('Cache-Control: no-cache, must-revalidate'); //HTTP 1.1
+	header('Pragma: no-cache'); //HTTP 1.0
+
 	if (!is_array($param)) {
 		$param['feedTitle'] = $param;
 	}
