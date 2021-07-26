@@ -817,10 +817,12 @@ function throwErr(string $message, int $code = 500): void
 	throw new \Exception($message);
 }
 
-function getImageFromDataSrcSet($dataSrcSet)
+function getImageFromDataSrcSet($dataSrcSet, $get_last = true)
 {
 	$dataSrcSet = explode(',', $dataSrcSet);
-	$dataSrcSet = trim($dataSrcSet[count($dataSrcSet) - 1]);
+	$dataSrcSet = trim($dataSrcSet[$get_last
+		? count($dataSrcSet) - 1
+		: 0]);
 
 	return preg_replace('/ .+/', '', $dataSrcSet);
 }
