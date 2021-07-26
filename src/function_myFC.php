@@ -826,8 +826,7 @@ function getImageFromDataSrcSet($dataSrcSet)
 }
 
 /**
- * @param string src
- * @param mixed $src
+ * @param string $src
  */
 function applyImageCache($src): string
 {
