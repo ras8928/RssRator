@@ -5,8 +5,9 @@ namespace ras8928\RssRator;
 abstract class RssRatorGetterSetter
 {
 	/**
-	 * Set the value of FeedTitle
+	 * Set the value of FeedTitle.
 	 *
+	 * @param mixed $FeedTitle
 	 */
 	public function setFeedTitle($FeedTitle): self
 	{
@@ -16,7 +17,7 @@ abstract class RssRatorGetterSetter
 	}
 
 	/**
-	 * Get the value of FeedDescription
+	 * Get the value of FeedDescription.
 	 */
 	public function getFeedDescription()
 	{
@@ -24,7 +25,7 @@ abstract class RssRatorGetterSetter
 	}
 
 	/**
-	 * Get the value of FeedTitle
+	 * Get the value of FeedTitle.
 	 */
 	public function getFeedTitle()
 	{
@@ -32,8 +33,9 @@ abstract class RssRatorGetterSetter
 	}
 
 	/**
-	 * Set the value of FeedDescription
+	 * Set the value of FeedDescription.
 	 *
+	 * @param mixed $FeedDescription
 	 */
 	public function setFeedDescription($FeedDescription): self
 	{
@@ -43,8 +45,9 @@ abstract class RssRatorGetterSetter
 	}
 
 	/**
-	 * Set the value of FeedOriginUrl
+	 * Set the value of FeedOriginUrl.
 	 *
+	 * @param mixed $FeedOriginUrl
 	 */
 	public function setOriginUrl($FeedOriginUrl): self
 	{

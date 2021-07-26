@@ -1,17 +1,17 @@
 <?php
 
 if (!defined('ROOT')) {
-	define("ROOT", __DIR__ . "/");
+	define('ROOT', __DIR__ . '/');
 }
 
 ini_set('max_execution_time', 300);
 if (!isset($GLOBALS['dontRSSheader'])) {
 	header('Content-Type: application/rss+xml; charset=utf-8');
 }
-header("Connection: Keep-Alive");
-header("Keep-Alive: timeout=300");
-header("Cache-Control: no-cache, must-revalidate"); //HTTP 1.1
-header("Pragma: no-cache"); //HTTP 1.0
+header('Connection: Keep-Alive');
+header('Keep-Alive: timeout=300');
+header('Cache-Control: no-cache, must-revalidate'); //HTTP 1.1
+header('Pragma: no-cache'); //HTTP 1.0
 if (isLocalhost()) {
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -24,11 +24,10 @@ if (!mt_rand(0, 50)) {
 	clearCache();
 }
 
-
 if (!function_exists('str_contains')) {
 	/**
 	 * @param array|string $needle
-	 * @param string $haystack
+	 *
 	 * @return bool
 	 */
 	function str_contains($needle, string $haystack)
@@ -39,12 +38,12 @@ if (!function_exists('str_contains')) {
 
 		if (is_array($needle)) {
 			foreach ($needle as $str) {
-				if (strpos($haystack, $str) !== false) {
+				if (false !== strpos($haystack, $str)) {
 					return true;
 				}
 			}
 		} else {
-			return strpos($haystack, $needle) !== false;
+			return false !== strpos($haystack, $needle);
 		}
 	}
 }
@@ -59,24 +58,21 @@ function relativeToAbsoluteURL($href, $url)
 
 	extract(parse_url($href), EXTR_PREFIX_ALL, 'href');
 
-
 	if (!isset($href_host)) {
-		if (substr($href, 0, 2) === '//') {
+		if ('//' === substr($href, 0, 2)) {
 			$href = $url_scheme . ':' . $href;
 		}
-		if ($href[0] == '/') {
-			$href = $url_scheme . "://" . $url_host . $href;
+		if ('/' == $href[0]) {
+			$href = $url_scheme . '://' . $url_host . $href;
 		} else {
-			$href = $url_scheme . "://" . $url_host . '/' . $href;
+			$href = $url_scheme . '://' . $url_host . '/' . $href;
 		}
 	}
 
 	if (filter_var($href, FILTER_VALIDATE_URL)) {
 		return $href;
 	}
-	return;
 }
-
 
 function cleanSpecial($txt, $trim = true)
 {
@@ -88,37 +84,38 @@ function cleanSpecial($txt, $trim = true)
 	if ($trim) {
 		$txt = trim(preg_replace('/\s+/', ' ', trim($txt)));
 	}
+
 	return $txt;
 }
 
-
 function utf8_urldecode($str)
 {
-	$str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str));
+	$str = preg_replace('/%u([0-9a-f]{3,4})/i', '&#x\\1;', urldecode($str));
+
 	return html_entity_decode($str, ENT_COMPAT, 'UTF-8');
 }
-
 
 function isLocalhost($whitelist = ['127.0.0.1', '::1'])
 {
 	return in_array($_SERVER['REMOTE_ADDR'] ?? '', $whitelist);
 }
 
-
 function getRealUserIp()
 {
 	switch (true) {
-		case (!empty($_SERVER['HTTP_X_REAL_IP'])):
+		case !empty($_SERVER['HTTP_X_REAL_IP']):
 			return $_SERVER['HTTP_X_REAL_IP'];
-		case (!empty($_SERVER['HTTP_CLIENT_IP'])):
+
+		case !empty($_SERVER['HTTP_CLIENT_IP']):
 			return $_SERVER['HTTP_CLIENT_IP'];
-		case (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])):
+
+		case !empty($_SERVER['HTTP_X_FORWARDED_FOR']):
 			return $_SERVER['HTTP_X_FORWARDED_FOR'];
+
 		default:
 			return $_SERVER['REMOTE_ADDR'];
 	}
 }
-
 
 function clearCache($days = 60, $dir = 'cache', $pattern = '/*')
 {
@@ -126,8 +123,8 @@ function clearCache($days = 60, $dir = 'cache', $pattern = '/*')
 
 	$total = 0;
 	$deleted = 0;
-	foreach (glob("$dir$pattern") as $f) {
-		$total++;
+	foreach (glob("{$dir}{$pattern}") as $f) {
+		++$total;
 		if (is_file($f) && (time() - filemtime($f) > $days)) {
 			$deleted += unlink($f);
 
@@ -135,9 +132,8 @@ function clearCache($days = 60, $dir = 'cache', $pattern = '/*')
 		}
 	}
 
-	return array('deleted' => $deleted, 'total' => $total);
+	return ['deleted' => $deleted, 'total' => $total];
 }
-
 
 function myFC_GlobalParams($html)
 {
@@ -145,18 +141,15 @@ function myFC_GlobalParams($html)
 	global $param;
 	global $feedTitle;
 
-
-	if (empty($html) || !$html || is_null($html) || strlen($html) == 0) {
-		die;
+	if (empty($html) || !$html || null === $html || 0 == strlen($html)) {
+		exit;
 	}
-
 
 	if (empty($GLOBALS['feedTitle']) && empty($param['feedTitle']) && empty($feedTitle)) {
 		if ($html->find('title', 0)) {
 			$param['feedTitle'] = cleanSpecial($html->find('title', 0)->innertext);
 		}
 	}
-
 
 	$param['favico'] = fetchPageFavicons($html);
 	$param['datemodified'] = fetchPageModified($html);
@@ -165,7 +158,6 @@ function myFC_GlobalParams($html)
 		// $param['feedDescription'] = fetchPageDescription($html);
 	}
 }
-
 
 function fetchPageModified()
 {
@@ -180,10 +172,10 @@ function fetchPageModified()
 	return $GLOBALS['datemodified'];
 }
 
-
 /**
  * @param $html_or_url
  * @param bool $fetch_from_url
+ *
  * @return array|bool
  */
 function fetchPageDescription($html_or_url, $fetch_from_url = false)
@@ -200,15 +192,13 @@ function fetchPageDescription($html_or_url, $fetch_from_url = false)
 		$html = $html_or_url;
 	}
 
-
 	$selectors = [
 		'//meta[name*="twitter:description"]',
 		'//meta[property="og:description"]',
 		'//meta[itemprop*="description"]',
-		'//meta[name*="description"]'
+		'//meta[name*="description"]',
 	];
 	$description = getAtrributeFromTag($html, $selectors, 'content');
-
 
 	if ($html->find('//meta[property="og:image"]', 0)) {
 		$image = cleanSpecial($html->find('//meta[property*="og:image"]', 0)->getAttribute('content'));
@@ -221,7 +211,6 @@ function fetchPageDescription($html_or_url, $fetch_from_url = false)
 	} else {
 		$image = null;
 	}
-
 
 	if ($html->find('//meta[name*="twitter:title"]', 0)) {
 		$title = cleanSpecial($html->find('//meta[name*="twitter:title"]', 0)->getAttribute('content'));
@@ -237,10 +226,10 @@ function fetchPageDescription($html_or_url, $fetch_from_url = false)
 		$title = null;
 	}
 
-
 	if (empty($description)) {
 		return false;
 	}
+
 	return [
 		'title' => $title,
 		'description' => $description,
@@ -248,11 +237,6 @@ function fetchPageDescription($html_or_url, $fetch_from_url = false)
 	];
 }
 
-/**
- * @param simple_html_dom $html
- * @param array $selectors
- * @param string $attribute_name
- */
 function getAtrributeFromTag(simple_html_dom $html, array $selectors, string $attribute_name)
 {
 	foreach ($selectors as $item) {
@@ -260,9 +244,7 @@ function getAtrributeFromTag(simple_html_dom $html, array $selectors, string $at
 			return cleanSpecial($html->find($item, 0)->getAttribute($attribute_name));
 		}
 	}
-	return null;
 }
-
 
 function isHTTP200($url, $returnMovedURL = false)
 {
@@ -284,6 +266,7 @@ function isHTTP200($url, $returnMovedURL = false)
 				if ($returnMovedURL) {
 					return $url;
 				}
+
 				return true;
 			}
 		}
@@ -293,12 +276,12 @@ function isHTTP200($url, $returnMovedURL = false)
 		if ($returnMovedURL) {
 			return $url;
 		}
+
 		return true;
 	}
 
 	return false;
 }
-
 
 function fetchPageOGImage($html, $fetchFromUrl = false)
 {
@@ -349,9 +332,9 @@ function fetchPageOGImage($html, $fetchFromUrl = false)
 	if (empty($ogimg)) {
 		return;
 	}
+
 	return applyImageCache($ogimg);
 }
-
 
 function fetchPageFavicons($html)
 {
@@ -395,7 +378,6 @@ function fetchPageFavicons($html)
 		$favico = fetchFavicon($html, 'link', 'rel', 'apple-touch', 'href');
 	}
 
-
 	// if (empty($favico)) {
 	// 	require_once('vendor/autoload.php');
 	// 	$scraper = new \Mpclarkson\IconScraper\Scraper();
@@ -410,7 +392,6 @@ function fetchPageFavicons($html)
 	// 		}
 	// }
 
-
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'image', 'href');
 	}
@@ -420,7 +401,6 @@ function fetchPageFavicons($html)
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'href', 'favico', 'href');
 	}
-
 
 	if (empty($favico) && !empty($url)) {
 		$tmp_favico = parse_url($url)['scheme'] . '://' . parse_url($url)['host'] . '/favicon.ico';
@@ -433,7 +413,6 @@ function fetchPageFavicons($html)
 		}
 	}
 
-
 	// if (empty($favico)) {
 	// 	{$favico='https://www.google.com/s2/favicons?domain=' . parse_url($url)['host'];}
 	// }
@@ -441,9 +420,9 @@ function fetchPageFavicons($html)
 	if (empty($favico)) {
 		return;
 	}
+
 	return $favico;
 }
-
 
 function fetchFavicon($html, $tag_name, $attribute_name, $attribute_content, $link_content)
 {
@@ -486,7 +465,6 @@ function fetchFavicon($html, $tag_name, $attribute_name, $attribute_content, $li
 			return;
 		}
 
-
 		// if (!str_contains('.svg',$favico) && !str_contains('.ico',$favico) ) {
 		// 	$localpath = 'cache/' . preg_replace('/\W+/', '', parse_url($url)['host']) . '.svg';
 		// 	if (!file_exists($localpath)) {
@@ -511,9 +489,7 @@ function fetchFavicon($html, $tag_name, $attribute_name, $attribute_content, $li
 		// }
 		return $favico;
 	}
-	return;
 }
-
 
 function usort_helper($a, $b)
 {
@@ -526,44 +502,43 @@ function usort_helper($a, $b)
 }
 
 /**
- * dump and die
+ * dump and die.
+ *
  * @param mixed $var
- * @param string $print_or_dump
  */
 function dd($var, string $print_or_dump = 'print')
 {
-	$print_or_dump == 'dump'
+	'dump' == $print_or_dump
 		? var_dump($var)
 		: print_r($var);
-	die;
-}
 
+	exit;
+}
 
 /**
  * @param $date
- * @return string|null
+ *
+ * @return null|string
  */
 function getRSSFormatDate($date)
 {
 	try {
 		return (new DateTime($date))->format(DATE_RSS);
 	} catch (Exception $e) {
-		return null;
+		return;
 	}
 }
-
 
 function googleFirstImage($searchString)
 {
 	return;
 	$searchString = urlencode(trim($searchString));
-	$searchURL = "http://www.bing.com/images/search?q=" . $searchString; //."&qft=+filterui:age-lt10080&FORM=IRFLTR";
+	$searchURL = 'http://www.bing.com/images/search?q=' . $searchString; //."&qft=+filterui:age-lt10080&FORM=IRFLTR";
 	$newhtml = str_get_html(myGet($searchURL, 72));
 	$img = $newhtml->find('img', 2)->src;
-	$img = preg_replace('/&amp;w=.+/', '', $img);
-	return $img;
-}
 
+	return preg_replace('/&amp;w=.+/', '', $img);
+}
 
 function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 {
@@ -573,17 +548,17 @@ function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 	if (is_array($cacheTimeOutHrs)) {
 		$param = $cacheTimeOutHrs;
 
-		$cacheTimeOutHrs = isset($param['cacheTimeOutHrs']) ? $param['cacheTimeOutHrs'] : 'N/A';
-		$output = isset($param['output']) ? $param['output'] : 'content';
-		$forceTrim = isset($param['forceTrim']) ? $param['forceTrim'] : 'false';
-		$removeScript = isset($param['removeScript']) ? $param['removeScript'] : 'false';
+		$cacheTimeOutHrs = $param['cacheTimeOutHrs'] ?? 'N/A';
+		$output = $param['output'] ?? 'content';
+		$forceTrim = $param['forceTrim'] ?? 'false';
+		$removeScript = $param['removeScript'] ?? 'false';
 	} else {
 		$forceTrim = false;
 		$removeScript = false;
 	}
 
 	// if no cache timeout given give standard timeout
-	if ($cacheTimeOutHrs == 'N/A') {
+	if ('N/A' == $cacheTimeOutHrs) {
 		// delay greater than 1 and less than 4
 		$cacheTimeOutHrs = 1 + rand(0, 100) / 100 * 3;
 	}
@@ -595,7 +570,7 @@ function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 	}
 
 	if (file_exists($cache_filepath)) {
-		if ($cacheTimeOutHrs != 0 && time() - filemtime($cache_filepath) > $cacheTimeOutHrs * 3600) {
+		if (0 != $cacheTimeOutHrs && time() - filemtime($cache_filepath) > $cacheTimeOutHrs * 3600) {
 			// too old , re-fetch
 			$CacheContents = actualGet($url, $cache_filepath, 'update');
 			// echo 'updated';
@@ -611,17 +586,16 @@ function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 		$CacheContents = actualGet($url, $cache_filepath, 'create');
 		// echo 'created';
 	}
-	if ($output == 'filepath') {
+	if ('filepath' == $output) {
 		return $cache_filepath;
 	}
 
-	if (empty($CacheContents) || strlen(trim($CacheContents)) == 0) {
+	if (empty($CacheContents) || 0 == strlen(trim($CacheContents))) {
 		throw new \Exception('Failure in myGet');
 	}
 
 	return $CacheContents;
 }
-
 
 function actualGet($url, $cache_filepath, $sts)
 {
@@ -629,16 +603,16 @@ function actualGet($url, $cache_filepath, $sts)
 	global $removeScript;
 
 	$referer = 'https://www.google.com/search?q=';
-	$referer .= str_replace(array('_', '-'), '+', basename($url));
+	$referer .= str_replace(['_', '-'], '+', basename($url));
 
-	$opts = array(
-		'http' => array(
-			'header' => array(
-				"Referer: $referer",
-				"Accept-language: en"
-			)
-		)
-	);
+	$opts = [
+		'http' => [
+			'header' => [
+				"Referer: {$referer}",
+				'Accept-language: en',
+			],
+		],
+	];
 
 	$context = stream_context_create($opts);
 
@@ -663,7 +637,6 @@ function actualGet($url, $cache_filepath, $sts)
 	return $CacheContents;
 }
 
-
 function myGetFilePath($url)
 {
 	$dirName = 'cache';
@@ -673,47 +646,48 @@ function myGetFilePath($url)
 	}
 
 	$cacheName = preg_replace('/\W+/', '', $url);
+
 	return "{$dirName}/{$cacheName}";
 }
-
 
 function myGetOnlyHead($url)
 {
 	$file_path = myGetFilePath($url);
 	if (file_exists($file_path)) {
-		return (array(
-			'contents' => file_get_contents($file_path)
-		));
+		return [
+			'contents' => file_get_contents($file_path),
+		];
 	}
 
 	$url = isHTTP200($url, true);
 	@$fp = fopen($url, 'r');
 	if (!$fp) {
-		return (array(
-			'error' => 'ERROR: invalid URL ' . $url
-		));
+		return [
+			'error' => 'ERROR: invalid URL ' . $url,
+		];
 	}
-	$contents = "";
+	$contents = '';
 	$i = 0;
 
-	while (strpos($contents, '<body') == false) {
+	while (false == strpos($contents, '<body')) {
 		$buffer = trim(fgets($fp, 512));
 		$contents .= $buffer;
 
 		if ($i > 0 && empty($contents)) {
-			return (array(
-				'error' => 'ERROR: falied to myGetOnlyHead() ' . $url
-			));
+			return [
+				'error' => 'ERROR: falied to myGetOnlyHead() ' . $url,
+			];
 		}
 
 		if ($i > 400) {
 			break;
-			return (array(
-				'error' => 'ERROR: couldnt download full head ' . $url
-			));
+
+			return [
+				'error' => 'ERROR: couldnt download full head ' . $url,
+			];
 		}
 
-		$i++;
+		++$i;
 	}
 
 	$contents = preg_replace('/.+<head>/is', '<head>', $contents);
@@ -728,13 +702,12 @@ function myGetOnlyHead($url)
 	$contents = preg_replace('/<style.+/is', '', $contents);
 	$contents = str_replace('>', ">\n", $contents);
 
-
 	file_put_contents($file_path, $contents);
-	return (array(
-		'contents' => $contents
-	));
-}
 
+	return [
+		'contents' => $contents,
+	];
+}
 
 function myGetTime($url)
 {
@@ -747,71 +720,62 @@ function myGetTime($url)
 	return gmdate(DATE_RSS, filemtime($cache_filepath));
 }
 
-
 function createDirIfNotExists($dirName)
 {
-
 	// if directory named $dirName does not exsist, create it.
 	if (!is_string($dirName)) {
 		return false;
 	}
 
 	$mode = 0777;
-	is_dir($dirName) || mkdir($dirName, $mode, true) || die;
+	is_dir($dirName) || mkdir($dirName, $mode, true) || exit;
 
 	return true;
 }
 
-
 function logGets($url, $getType)
 {
-
 	// createDirIfNotExists('logs');
-	$logPath = "GetsLog.txt";
+	$logPath = 'GetsLog.txt';
 	$mode = (!file_exists($logPath)) ? 'w' : 'a';
 	$logfile = fopen($logPath, $mode);
 
 	$data1 = (new DateTime())->format(DATE_RSS);
 	$data20 = basename($_SERVER['SCRIPT_FILENAME']);
-	$data25 = $_SERVER["QUERY_STRING"] ?? '';
+	$data25 = $_SERVER['QUERY_STRING'] ?? '';
 	$data3 = $getType;
 	$data4 = $url;
 	$data5 = getRealUserIp();
 
-	$mask = "%25.25s | %20.20s | %-40.40s | %-6.6s | %-100.100s | %-15.15s";
+	$mask = '%25.25s | %20.20s | %-40.40s | %-6.6s | %-100.100s | %-15.15s';
 	$data = sprintf($mask, $data1, $data20, $data25, $data3, $data4, $data5);
 
 	fwrite($logfile, "\n" . $data);
 	fclose($logfile);
 }
 
-
 function logHeaders()
 {
 	// createDirIfNotExists('logs');
-	$logPath = "RunHeadersLog.txt";
+	$logPath = 'RunHeadersLog.txt';
 	$mode = (!file_exists($logPath)) ? 'w' : 'a';
 	$logfile = fopen($logPath, $mode);
 
 	$data1 = (new DateTime())->format(DATE_RSS);
 	$data2 = basename($_SERVER['SCRIPT_FILENAME']);
 	$data3 = getRealUserIp();
-	$data4 = $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
+	$data4 = $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 	$data5 = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : null;
 
-
-	$mask = "%25.25s | %-20.20s | %-15.15s | %-100.100s | %-50.50s";
+	$mask = '%25.25s | %-20.20s | %-15.15s | %-100.100s | %-50.50s';
 	$data = sprintf($mask, $data1, $data2, $data3, $data4, $data5);
-
 
 	// $data = trim($data);
 	// $data = str_replace("|", "\t\t", $data);
 
-
 	fwrite($logfile, "\n" . $data);
 	fclose($logfile);
 }
-
 
 function rotateLog(
 	string $filename,
@@ -820,20 +784,19 @@ function rotateLog(
 ) {
 	if (file_exists($filename)) {
 		if (filesize($filename) > $rotate_size) {
-			if (file_exists($filename . "." . $files_to_keep)) {
-				@unlink($filename . "." . $files_to_keep);
+			if (file_exists($filename . '.' . $files_to_keep)) {
+				@unlink($filename . '.' . $files_to_keep);
 			}
-			for ($i = $files_to_keep; $i > 0; $i--) {
-				if (file_exists($filename . "." . $i)) {
+			for ($i = $files_to_keep; $i > 0; --$i) {
+				if (file_exists($filename . '.' . $i)) {
 					$next = $i + 1;
-					@rename($filename . "." . $i, $filename . "." . $next);
+					@rename($filename . '.' . $i, $filename . '.' . $next);
 				}
 			}
-			rename($filename, $filename . ".1");
+			rename($filename, $filename . '.1');
 		}
 	}
 }
-
 
 function throwErr(string $message, int $code = 500): void
 {
@@ -841,28 +804,31 @@ function throwErr(string $message, int $code = 500): void
 
 	switch ($code) {
 		case '400':
-			header("HTTP/1.1 400 Bad Request");
+			header('HTTP/1.1 400 Bad Request');
+
 			break;
 
 		default:
 			$code = 500;
-			header("HTTP/1.1 500 Internal Server Error");
+			header('HTTP/1.1 500 Internal Server Error');
+
 			break;
 	}
+
 	throw new \Exception($message);
 }
-
 
 function getImageFromDataSrcSet($dataSrcSet)
 {
 	$dataSrcSet = explode(',', $dataSrcSet);
-	$dataSrcSet = trim($dataSrcSet[sizeof($dataSrcSet) - 1]);
-	$dataSrcSet = preg_replace('/ .+/', '', $dataSrcSet);
-	return $dataSrcSet;
+	$dataSrcSet = trim($dataSrcSet[count($dataSrcSet) - 1]);
+
+	return preg_replace('/ .+/', '', $dataSrcSet);
 }
 
 /**
  * @param string src
+ * @param mixed $src
  */
 function applyImageCache($src): string
 {
@@ -872,7 +838,6 @@ function applyImageCache($src): string
 			? localImageCache($src)
 			: 'https://agvhvzedvo.cloudimg.io/v7/' . $src . '?width=800&org_if_sml=1&force_format=webp');
 }
-
 
 function localImageCache($src): string
 {
@@ -885,7 +850,6 @@ function localImageCache($src): string
 
 	return $img;
 }
-
 
 function hashify($excerpt)
 {
@@ -905,11 +869,9 @@ function hashify($excerpt)
 	$excerpt = str_replace(' JI ', ' #JI ', $excerpt);
 
 	$excerpt = str_replace(' (PSX) ', ' #$1 ', $excerpt);
-	$excerpt = str_replace(' (PSL) ', ' #$1 ', $excerpt);
 
-	return $excerpt;
+	return str_replace(' (PSL) ', ' #$1 ', $excerpt);
 }
-
 
 function generateMusicDescription($meta)
 {
@@ -948,10 +910,8 @@ function generateMusicDescription($meta)
 
 	$description .= $iframe;
 
-
 	return $description;
 }
-
 
 function generateMusicExternalLinks($item)
 {
@@ -964,10 +924,9 @@ function generateMusicExternalLinks($item)
 	$content .= '<a href="https://torrentz2.eu/search?f={%itemEncoded}">tz.eu</a>';
 
 	$content = str_replace('{%item}', $item, $content);
-	$content = str_replace('{%itemEncoded}', $itemEncoded, $content);
-	return $content;
-}
 
+	return str_replace('{%itemEncoded}', $itemEncoded, $content);
+}
 
 function parseOutput($feedItems, $param)
 {
@@ -975,7 +934,6 @@ function parseOutput($feedItems, $param)
 		$param['feedTitle'] = $param;
 	}
 	$feedTitle = $param['feedTitle'];
-
 
 	if (empty($param['feedDescription'])) {
 		if (empty($param['description'])) {
@@ -985,7 +943,6 @@ function parseOutput($feedItems, $param)
 		}
 	}
 
-
 	$out = null;
 	$out .= '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 	$out .= '<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:webfeeds="http://webfeeds.org/rss/1.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">' . "\n";
@@ -993,13 +950,11 @@ function parseOutput($feedItems, $param)
 	$out .= '<title>' . $feedTitle . '</title>' . "\n";
 	$out .= '<description><![CDATA[' . $param['feedDescription'] . ']]></description>' . "\n";
 
-
 	if (!empty($param['datemodified'])) {
 		header('Last-Modified: ' . $param['datemodified']);
 		$out .= "<lastBuildDate>{$param['datemodified']}</lastBuildDate>" . "\n";
-		$out .= "<pubDate>" . gmdate(DATE_RSS) . "</pubDate>" . "\n";
+		$out .= '<pubDate>' . gmdate(DATE_RSS) . '</pubDate>' . "\n";
 	}
-
 
 	if (!empty($param['favico'])) {
 		if ($_SERVER['HTTP_HOST'] != parse_url($param['favico'])['host']) {
@@ -1012,16 +967,13 @@ function parseOutput($feedItems, $param)
 		// $out .= "<icon>http://googleweblight.com/?lite_image_url={$param['favico']}</icon>" . "\n";
 	}
 
-
 	if (!empty($param['ttl'])) {
 		$out .= "<ttl>{$param['ttl']}</ttl>";
 	} elseif (!empty($param['datemodified']) && empty($param['ttl'])) {
-		$out .= "<ttl>60</ttl>";
+		$out .= '<ttl>60</ttl>';
 	}
 
-
 	$out .= "\n";
-
 
 	foreach ($feedItems as $item) {
 		$out .= "\n";
@@ -1029,12 +981,10 @@ function parseOutput($feedItems, $param)
 		$out .= "\n";
 		$out .= '<title><![CDATA[' . $item['title'] . ']]></title>';
 
-
 		if (array_key_exists('url', $item)) {
 			$out .= "\n";
 			$out .= '<link>' . $item['url'] . '</link>';
 		}
-
 
 		if (array_key_exists('guid', $item)) {
 			$out .= "\n";
@@ -1044,7 +994,6 @@ function parseOutput($feedItems, $param)
 			$out .= '<guid isPermaLink="true">' . $item['url'] . '</guid>';
 		}
 
-
 		// determine img/thumb
 		$img = null;
 		$thumb = null;
@@ -1053,33 +1002,31 @@ function parseOutput($feedItems, $param)
 		}
 		if (array_key_exists('img', $item)) {
 			$img = $item['img'];
-			$thumb = ($thumb ? $thumb : $img);
+			$thumb = ($thumb ?: $img);
 		} else {
-			$img = ($thumb ? $thumb : false);
+			$img = ($thumb ?: false);
 		}
 
 		if ($img) {
-			if (strpos($thumb, 'http://googleweblight.com/?lite_image_url=') !== false) {
+			if (false !== strpos($thumb, 'http://googleweblight.com/?lite_image_url=')) {
 				$thumb = str_replace('http://googleweblight.com/?lite_image_url=', '', $thumb);
 				$thumb = urldecode($thumb);
 			}
 		}
 
-
 		if (array_key_exists('description', $item)) {
 			$out .= "\n";
 			$out .= '<description><![CDATA[';
 			if (!isset($item['DisableThumbsInDesc']) && strlen($img) > 0) {
-				$imgcaption = empty($item["imgcaption"]) ? null : $item["imgcaption"];
+				$imgcaption = empty($item['imgcaption']) ? null : $item['imgcaption'];
 				$out .= "<p><img src=\"{$img}\" title=\"{$imgcaption}\"/></p>";
 				// $out .= "<p><img class=\"webfeedsFeaturedVisual\" src=\"{$img}\" /></p>";
 			}
 
-			$out .= empty($item["imgcaption"]) ? null : "<small><em>{$item['imgcaption']}</em></small><br><br>";
+			$out .= empty($item['imgcaption']) ? null : "<small><em>{$item['imgcaption']}</em></small><br><br>";
 			$out .= $item['description'];
 			$out .= ']]></description>';
 		}
-
 
 		if ($thumb) {
 			$out .= "\n";
@@ -1090,26 +1037,22 @@ function parseOutput($feedItems, $param)
 			$out .= "<enclosure url=\"{$thumb}\" length=\"1\" type=\"image/jpeg\"/>";
 		}
 
-
 		if (array_key_exists('date', $item)) {
 			$out .= "\n";
 			$out .= '<pubDate><![CDATA[' . $item['date'] . ']]></pubDate>';
 		}
-
 
 		if (array_key_exists('author', $item)) {
 			$out .= "\n";
 			$out .= '<author><![CDATA[' . $item['author'] . ']]></author>';
 		}
 
-
 		if (array_key_exists('source', $item)) {
 			$out .= "\n";
 			$out .= '<source url="';
-			$out .= strpos($item['source'], 'http') == false ? 'http://' . $item['source'] : $item['source'];
+			$out .= false == strpos($item['source'], 'http') ? 'http://' . $item['source'] : $item['source'];
 			$out .= '"><![CDATA[' . $item['source'] . ']]></source>';
 		}
-
 
 		$out .= "\n";
 		$out .= '</item>';
@@ -1124,28 +1067,27 @@ function parseOutput($feedItems, $param)
 	echo $out;
 }
 
-
 function rssCache_Name()
 {
-	$cachename = basename($_SERVER['SCRIPT_FILENAME']) . ($_SERVER["QUERY_STRING"] ?? '');
+	$cachename = basename($_SERVER['SCRIPT_FILENAME']) . ($_SERVER['QUERY_STRING'] ?? '');
 	$cachename = myGetFilePath($cachename) . '.xml';
 
 	return $cachename;
 }
 
-
 function rssCache_Serve()
 {
 	if (
-		@$_SESSION['myGet'] == 'fresh' &&
-		empty($_SESSION['overrideRSScache']) &&
-		!isset($_GET['overrideCache']) &&
-		!isset($_GET['overrideRSSCache'])
+		'fresh' == @$_SESSION['myGet']
+		&& empty($_SESSION['overrideRSScache'])
+		&& !isset($_GET['overrideCache'])
+		&& !isset($_GET['overrideRSSCache'])
 	) {
 		if (file_exists(rssCache_Name())) {
 			echo file_get_contents(rssCache_Name());
 			$_SESSION['rssCache'] = true;
-			die;
+
+			exit;
 		}
 	}
 }

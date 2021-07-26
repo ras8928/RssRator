@@ -4,7 +4,7 @@ namespace ras8928\RssRator;
 
 use Carbon\Carbon;
 
-require_once('function_myFC.php');
+require_once 'function_myFC.php';
 
 class ContentItem extends ArrayAble
 {
@@ -59,7 +59,7 @@ class ContentItem extends ArrayAble
 		return $this->encloseInCDATA($this->Date);
 	}
 
-	/** @param string|Carbon|\DateTime $Date */
+	/** @param Carbon|\DateTime|string $Date */
 	public function setDate($Date = null): self
 	{
 		if (

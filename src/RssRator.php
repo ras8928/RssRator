@@ -57,12 +57,13 @@ class RssRator extends RssRatorGetterSetter
 	public function publish()
 	{
 		header('Content-Type: application/rss+xml; charset=utf-8');
-		header("Connection: Keep-Alive");
-		header("Keep-Alive: timeout=300");
-		header("Cache-Control: no-cache, must-revalidate"); //HTTP 1.1
-		header("Pragma: no-cache"); //HTTP 1.0
+		header('Connection: Keep-Alive');
+		header('Keep-Alive: timeout=300');
+		header('Cache-Control: no-cache, must-revalidate'); //HTTP 1.1
+		header('Pragma: no-cache'); //HTTP 1.0
 
 		echo $this->getRss();
+
 		exit;
 	}
 
@@ -104,7 +105,7 @@ class RssRator extends RssRatorGetterSetter
 	}
 
 	/**
-	 * @return false|DOMNode
+	 * @return DOMNode|false
 	 */
 	private function appendChild(DOMNode $ParentElement, string $ElementName, string $Content = null, array $Attribs = [])
 	{
