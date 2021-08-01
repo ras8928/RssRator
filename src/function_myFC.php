@@ -16,11 +16,12 @@ if (!mt_rand(0, 50)) {
 
 if (!function_exists('str_contains')) {
 	/**
+	 * @param string $haystack
 	 * @param array|string $needle
 	 *
 	 * @return bool
 	 */
-	function str_contains($needle, string $haystack)
+	function str_contains(string $haystack, $needle)
 	{
 		if (!$haystack) {
 			return false;
@@ -37,6 +38,35 @@ if (!function_exists('str_contains')) {
 		}
 	}
 }
+
+/** returns sub-string after the needle */
+function str_after($haystack, $needle)
+{
+	if ((int) $needle) {
+		return substr($haystack, -$needle);
+	}
+	if (str_contains($haystack, $needle)) {
+		$haystack = strstr($haystack, $needle);
+
+		return substr($haystack, strlen($needle));
+	}
+
+	return $haystack;
+}
+
+/** returns sub-string before the needle */
+function str_before($haystack, $needle)
+{
+	if ((int) $needle) {
+		return substr($haystack, -$needle);
+	}
+	if (str_contains($haystack, $needle)) {
+		return strstr($haystack, $needle, true);
+	}
+
+	return $haystack;
+}
+
 
 function relativeToAbsoluteURL($href, $url)
 {
@@ -258,7 +288,7 @@ function isHTTP200($url, $returnMovedURL = false)
 	//	 var_dump($hdr);
 
 	if (!empty($hdr['LOCATION'])) {
-		if (str_contains('moved', $http_code)) {
+		if (str_contains($http_code, 'moved')) {
 			$url = $hdr['LOCATION'];
 
 			if (isHTTP200($url)) {
@@ -271,7 +301,7 @@ function isHTTP200($url, $returnMovedURL = false)
 		}
 	}
 
-	if (str_contains('200', $http_code)) {
+	if (str_contains($http_code, '200')) {
 		if ($returnMovedURL) {
 			return $url;
 		}
@@ -834,7 +864,7 @@ function applyImageCache($src): string
 {
 	return !$src
 		? ''
-		: (str_contains('?', $src)
+		: (str_contains($src, '?')
 			? localImageCache($src)
 			: 'https://agvhvzedvo.cloudimg.io/v7/' . $src . '?width=800&org_if_sml=1&force_format=webp');
 }
@@ -930,9 +960,6 @@ function generateMusicExternalLinks($item)
 
 function parseOutput($feedItems, $param)
 {
-	if (!isset($GLOBALS['dontRSSheader'])) {
-		header('Content-Type: application/rss+xml; charset=utf-8');
-	}
 	header('Connection: Keep-Alive');
 	header('Keep-Alive: timeout=300');
 	header('Cache-Control: no-cache, must-revalidate'); //HTTP 1.1
