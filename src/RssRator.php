@@ -51,7 +51,11 @@ class RssRator extends RssRatorGetterSetter
 		$this->setFeedMeta();
 		$this->createItems();
 
-		return $this->dom->saveXML();
+		$rss = $this->dom->saveXML();
+
+		file_put_contents(rssCache_Name(), $rss);
+
+		return $rss;
 	}
 
 	public function publish()
