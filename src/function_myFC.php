@@ -2,6 +2,10 @@
 
 ini_set('max_execution_time', 300);
 
+if (!isset($GLOBALS['dontRSSheader'])) {
+	header('Content-Type: application/rss+xml; charset=utf-8');
+}
+
 if (isLocalhost()) {
 	error_reporting(E_ALL);
 	ini_set('display_errors', 1);
@@ -92,6 +96,11 @@ function relativeToAbsoluteURL($href, $url)
 	if (filter_var($href, FILTER_VALIDATE_URL)) {
 		return $href;
 	}
+}
+
+function trim_whitespace($txt)
+{
+	return trim(preg_replace('/\s+/i', ' ', trim($txt)));
 }
 
 function cleanSpecial($txt, $trim = true)
