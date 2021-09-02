@@ -20,7 +20,6 @@ if (!mt_rand(0, 50)) {
 
 if (!function_exists('str_contains')) {
 	/**
-	 * @param string $haystack
 	 * @param array|string $needle
 	 *
 	 * @return bool
@@ -49,6 +48,7 @@ function str_after($haystack, $needle)
 	if ((int) $needle) {
 		return substr($haystack, -$needle);
 	}
+
 	if (str_contains($haystack, $needle)) {
 		$haystack = strstr($haystack, $needle);
 
@@ -64,13 +64,13 @@ function str_before($haystack, $needle)
 	if ((int) $needle) {
 		return substr($haystack, -$needle);
 	}
+
 	if (str_contains($haystack, $needle)) {
 		return strstr($haystack, $needle, true);
 	}
 
 	return $haystack;
 }
-
 
 function relativeToAbsoluteURL($href, $url)
 {
@@ -86,6 +86,7 @@ function relativeToAbsoluteURL($href, $url)
 		if ('//' === substr($href, 0, 2)) {
 			$href = $url_scheme . ':' . $href;
 		}
+
 		if ('/' == $href[0]) {
 			$href = $url_scheme . '://' . $url_host . $href;
 		} else {
@@ -115,12 +116,14 @@ function cleanSpecial($txt, $trim = true)
 		"'",
 		$txt
 	);
+
 	if ($trim) {
 		$txt = trim($txt);
 	}
 	$txt = htmlspecialchars_decode(urldecode(stripcslashes(html_entity_decode($txt, ENT_COMPAT, 'UTF-8'))));
+
 	if ($trim) {
-		$txt = trim(preg_replace('/\s+/', ' ', trim($txt)));
+		$txt = trim_whitespace($txt);
 	}
 
 	return $txt;
@@ -163,6 +166,7 @@ function clearCache($days = 60, $dir = 'cache', $pattern = '/*')
 	$deleted = 0;
 	foreach (glob("{$dir}{$pattern}") as $f) {
 		++$total;
+
 		if (is_file($f) && (time() - filemtime($f) > $days)) {
 			$deleted += unlink($f);
 
@@ -339,30 +343,39 @@ function fetchPageOGImage($html, $fetchFromUrl = false)
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'twitter:image', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'twitter:image:alt', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'twitter:image:src', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'sailthru.image.full', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'og:image', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'og:image:alt', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'image', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'thumbnail', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'property', 'pinterest:media', 'content');
 	}
+
 	if (empty($ogimg)) {
 		$ogimg = fetchFavicon($html, 'meta', 'itemprop', 'image', 'value');
 	}
@@ -393,6 +406,7 @@ function fetchPageFavicons($html)
 	}
 
 	$localpath = 'cache/' . preg_replace('/\W+/', '', parse_url($url)['host']) . '.svg';
+
 	if (file_exists($localpath)) {
 		$favico = 'http://' . $_SERVER['HTTP_HOST'] . str_replace(basename($_SERVER['PHP_SELF']), '', $_SERVER['PHP_SELF']) . $localpath;
 	}
@@ -400,18 +414,23 @@ function fetchPageFavicons($html)
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'logo', 'href');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'mask-icon', 'href');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'fluid-icon', 'href');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'msapplication-TileImage', 'content');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'meta', 'name', 'msapplication-TileImage', 'content');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'apple-touch', 'href');
 	}
@@ -433,9 +452,11 @@ function fetchPageFavicons($html)
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'image', 'href');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'rel', 'icon', 'href');
 	}
+
 	if (empty($favico)) {
 		$favico = fetchFavicon($html, 'link', 'href', 'favico', 'href');
 	}
@@ -499,6 +520,7 @@ function fetchFavicon($html, $tag_name, $attribute_name, $attribute_content, $li
 		$GLOBALS['favico_type'] = "{$tag_name}{$attribute_name}_{$attribute_content}";
 		$favico = relativeToAbsoluteURL($favico, $url);
 		$favico = isHTTP200($favico, true);
+
 		if (!$favico) {
 			return;
 		}
@@ -542,7 +564,6 @@ function usort_helper($a, $b)
 /**
  * dump and die.
  *
- * @param mixed $var
  */
 function dd($var, string $print_or_dump = 'print')
 {
@@ -611,7 +632,6 @@ function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 		if (0 != $cacheTimeOutHrs && time() - filemtime($cache_filepath) > $cacheTimeOutHrs * 3600) {
 			// too old , re-fetch
 			$CacheContents = actualGet($url, $cache_filepath, 'update');
-			// echo 'updated';
 		} else {
 			// cache is still fresh
 			$CacheContents = file_get_contents($cache_filepath);
@@ -624,6 +644,7 @@ function myGet($url, $cacheTimeOutHrs = 'N/A', $output = 'content')
 		$CacheContents = actualGet($url, $cache_filepath, 'create');
 		// echo 'created';
 	}
+
 	if ('filepath' == $output) {
 		return $cache_filepath;
 	}
@@ -655,6 +676,7 @@ function actualGet($url, $cache_filepath, $sts)
 	$context = stream_context_create($opts);
 
 	$CacheContents = file_get_contents($url, false, $context);
+
 	if ($forceTrim) {
 		if ($removeScript) {
 			$CacheContents = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $CacheContents);
@@ -691,6 +713,7 @@ function myGetFilePath($url)
 function myGetOnlyHead($url)
 {
 	$file_path = myGetFilePath($url);
+
 	if (file_exists($file_path)) {
 		return [
 			'contents' => file_get_contents($file_path),
@@ -699,6 +722,7 @@ function myGetOnlyHead($url)
 
 	$url = isHTTP200($url, true);
 	@$fp = fopen($url, 'r');
+
 	if (!$fp) {
 		return [
 			'error' => 'ERROR: invalid URL ' . $url,
@@ -919,6 +943,7 @@ function generateMusicDescription($meta)
 	if (!empty($meta['genre'])) {
 		$description .= "\n<b>{$meta['genre']}</b>";
 	}
+
 	if (!empty($meta['date'])) {
 		$description .= "\n<b>{$meta['date']}</b>";
 	}
@@ -1037,9 +1062,11 @@ function parseOutput($feedItems, $param)
 		// determine img/thumb
 		$img = null;
 		$thumb = null;
+
 		if (array_key_exists('thumb', $item)) {
 			$thumb = $item['thumb'];
 		}
+
 		if (array_key_exists('img', $item)) {
 			$img = $item['img'];
 			$thumb = ($thumb ?: $img);
@@ -1057,6 +1084,7 @@ function parseOutput($feedItems, $param)
 		if (array_key_exists('description', $item)) {
 			$out .= "\n";
 			$out .= '<description><![CDATA[';
+
 			if (!isset($item['DisableThumbsInDesc']) && strlen($img) > 0) {
 				$imgcaption = empty($item['imgcaption']) ? null : $item['imgcaption'];
 				$out .= "<p><img src=\"{$img}\" title=\"{$imgcaption}\"/></p>";

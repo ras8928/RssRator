@@ -2,7 +2,7 @@
 
 namespace ras8928\RssRator;
 
-abstract class RssRatorGetterSetter
+class RssRatorGetterSetter
 {
 	/**
 	 * Set the value of FeedTitle.
@@ -35,9 +35,9 @@ abstract class RssRatorGetterSetter
 	/**
 	 * Set the value of FeedDescription.
 	 *
-	 * @param mixed $FeedDescription
+	 * @param string $FeedDescription
 	 */
-	public function setFeedDescription($FeedDescription): self
+	public function setFeedDescription(string $FeedDescription): self
 	{
 		$this->FeedDescription = cleanSpecial($FeedDescription);
 
@@ -47,9 +47,9 @@ abstract class RssRatorGetterSetter
 	/**
 	 * Set the value of FeedOriginUrl.
 	 *
-	 * @param mixed $FeedOriginUrl
+	 * @param string $FeedOriginUrl
 	 */
-	public function setOriginUrl($FeedOriginUrl): self
+	public function setOriginUrl(string $FeedOriginUrl): self
 	{
 		$this->FeedOriginUrl = $FeedOriginUrl;
 
